@@ -23,6 +23,7 @@ from telegram.ext import (
     ContextTypes,
 )
 
+from entry_exit import hitung_entry_exit, format_pesan_entry_exit
 from portfolio import (
     catat_beli,
     catat_jual,
@@ -196,6 +197,44 @@ async def cmd_hapus(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
+async def cmd_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not cek_user(update):
+        return await tolak(update)
+
+    if not context.args:
+        await update.message.reply_text(
+            "⚠️ Gunakan: ",
+            parse_mode="Markdown"
+        )
+        return
+
+    kode = context.args[0].upper()
+    if not kode.endswith(".JK"):
+        kode += ".JK"
+
+    await update.message.reply_text(
+        f"⏳ Clau sedang hitung entry & exit untuk *{kode.replace('.JK','')}*...",
+        parse_mode="Markdown"
+    )
+
+    try:
+        from data_fetcher import ambil_data_saham, ambil_info_saham
+        df = ambil_data_saham(kode)
+        info = ambil_info_saham(kode)
+
+        if df is None or df.empty:
+            await update.message.reply_text(f"⚠️ Data {kode} tidak tersedia.")
+            return
+
+        hasil = hitung_entry_exit(df, info)
+        nama = info.get("nama", "")
+        pesan = format_pesan_entry_exit(kode, hasil, nama)
+        await update.message.reply_text(pesan, parse_mode="Markdown")
+
+    except Exception as e:
+        await update.message.reply_text(f"⚠️ Gagal hitung entry/exit: {e}")
+
+
 async def cmd_analisis(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not cek_user(update):
         return await tolak(update)
@@ -253,6 +292,7 @@ def main():
     app.add_handler(CommandHandler("beli", cmd_beli))
     app.add_handler(CommandHandler("jual", cmd_jual))
     app.add_handler(CommandHandler("hapus", cmd_hapus))
+    app.add_handler(CommandHandler("entry", cmd_entry))
     app.add_handler(CommandHandler("analisis", cmd_analisis))
 
     app.run_polling(allowed_updates=Update.ALL_TYPES)
