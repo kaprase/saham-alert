@@ -37,8 +37,19 @@ def cetak_banner():
 
 
 def ambil_daftar_saham() -> list:
-    raw = os.getenv("DAFTAR_SAHAM", "BBCA.JK,BBRI.JK,TLKM.JK")
-    return [s.strip().upper() for s in raw.split(",") if s.strip()]
+    from saham_syariah import ambil_daftar_syariah, filter_saham_syariah
+
+    raw = os.getenv("DAFTAR_SAHAM", "").strip()
+    indeks = os.getenv("INDEKS_SYARIAH", "JII70").upper()
+    github_user = os.getenv("GITHUB_USER", "").strip() or None
+
+    if raw:
+        daftar = [s.strip().upper() for s in raw.split(",") if s.strip()]
+        print(f"📋 Mode: filter manual → hanya syariah {indeks}")
+        return filter_saham_syariah(daftar, indeks)
+    else:
+        print(f"📋 Mode: otomatis daftar {indeks}")
+        return ambil_daftar_syariah(indeks, github_user)
 
 
 def jalankan_analisis(kirim_semua: bool = False):
