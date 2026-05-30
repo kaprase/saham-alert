@@ -1,0 +1,28 @@
+name: Clau Portfolio Bot
+
+on:
+  workflow_dispatch:  # Jalankan manual dari GitHub Actions
+
+jobs:
+  jalankan-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350  # ~6 jam, maksimal GitHub Actions
+
+    steps:
+      - name: Ambil kode dari repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install library
+        run: pip install -r requirements.txt
+
+      - name: Jalankan Clau Portfolio Bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python telegram_listener.py
