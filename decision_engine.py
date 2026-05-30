@@ -158,7 +158,7 @@ def format_pesan_telegram(laporan: dict) -> str:
         f"",
         f"━━━━━━━━━━━━━━━━━━━━",
         f"💡 *{k['deskripsi']}*",
-        f"⚠️ _Bukan rekomendasi investasi. DYOR!_",
+        f"🤖 Powered by Clau - Kandip's smartest assistant 😎",
     ]
 
     return "\n".join(baris)
