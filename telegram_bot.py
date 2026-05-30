@@ -88,7 +88,7 @@ def kirim_ringkasan_harian(semua_laporan: list) -> bool:
 
     baris += [
         f"\n━━━━━━━━━━━━━━━━━━━━",
-        f"⚠️ _Ini bukan rekomendasi investasi. Lakukan riset sendiri._",
+        f"🤖 Powered by Clau - Kandip's smartest assistant 😎",
     ]
 
     return kirim_pesan("\n".join(baris))
