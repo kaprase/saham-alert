@@ -6,7 +6,9 @@ Modul untuk mengirim notifikasi via Telegram Bot
 import os
 import asyncio
 import requests
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+WIB = timezone(timedelta(hours=7))
 
 
 def kirim_pesan(teks: str, parse_mode: str = "Markdown") -> bool:
@@ -54,7 +56,7 @@ def kirim_ringkasan_harian(semua_laporan: list) -> bool:
     """
     Kirim ringkasan semua saham yang dianalisis hari ini.
     """
-    now = datetime.now().strftime("%d %b %Y %H:%M WIB")
+    now = datetime.now(WIB).strftime("%d %b %Y %H:%M WIB")
     baris = [
         f"📋 *RINGKASAN ANALISIS SAHAM*",
         f"🕐 {now}",
