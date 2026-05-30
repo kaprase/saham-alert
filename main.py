@@ -8,7 +8,9 @@ import os
 import sys
 import time
 import schedule
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+WIB = timezone(timedelta(hours=7))
 from dotenv import load_dotenv
 from colorama import init, Fore, Style
 
@@ -58,7 +60,7 @@ def jalankan_analisis(kirim_semua: bool = False):
     kirim_semua=True → kirim ringkasan ke Telegram
     kirim_semua=False → hanya kirim sinyal BUY/SELL
     """
-    waktu = datetime.now().strftime("%d/%m/%Y %H:%M")
+    waktu = datetime.now(WIB).strftime("%d/%m/%Y %H:%M WIB")
     print(f"\n{Fore.YELLOW}⏰ Analisis dimulai: {waktu}{Style.RESET_ALL}")
 
     daftar = ambil_daftar_saham()
