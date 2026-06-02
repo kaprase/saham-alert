@@ -2,13 +2,8 @@ name: Analisis Saham IDX
 
 on:
   schedule:
-    # Semua waktu dalam UTC (WIB = UTC+7, jadi kurangi 7 jam)
-    # 09:30 WIB = 02:30 UTC
-    - cron: '30 2 * * 1-5'
-    # 12:00 WIB = 05:00 UTC
-    - cron: '0 5 * * 1-5'
-    # 15:30 WIB = 08:30 UTC
-    - cron: '30 8 * * 1-5'
+    # 08:00 WIB = 01:00 UTC
+    - cron: '0 1 * * 1-5'
   workflow_dispatch:
     inputs:
       mode:
@@ -46,11 +41,10 @@ jobs:
           now = datetime.now(WIB)
           jam = now.hour
           print(f'Waktu WIB: {now.strftime(\"%d/%m/%Y %H:%M WIB\")}')
-          # Hanya jalankan di jam bursa (09:00-16:00 WIB)
-          if not (9 <= jam <= 16):
-              print(f'SKIP: Di luar jam bursa ({jam}:xx WIB)')
+          if not (7 <= jam <= 9):
+              print(f'SKIP: Di luar jam yang diharapkan ({jam}:xx WIB)')
               exit(1)
-          print('OK: Dalam jam bursa, lanjut analisis')
+          print('OK: Jam sesuai, lanjut analisis')
           "
 
       - name: Jalankan analisis (terjadwal)
@@ -75,5 +69,5 @@ jobs:
           DAFTAR_SAHAM: ${{ vars.DAFTAR_SAHAM || '' }}
           SKOR_BUY: ${{ vars.SKOR_BUY || '65' }}
           SKOR_SELL: ${{ vars.SKOR_SELL || '35' }}
-        run: python main.py ${{ github.event.inputs.mode }}
+        run: python main
 
