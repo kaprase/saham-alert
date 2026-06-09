@@ -21,26 +21,16 @@ jobs:
     steps:
       - name: Ambil kode dari repository
         uses: actions/checkout@v4
+
       - name: Setup Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
+
       - name: Install library
         run: pip install -r requirements.txt
-      - name: Cek waktu sekarang (WIB)
-        run: |
-          python -c "
-          from datetime import datetime, timezone, timedelta
-          WIB = timezone(timedelta(hours=7))
-          now = datetime.now(WIB)
-          jam = now.hour
-          print(f'Waktu WIB: {now.strftime(\"%d/%m/%Y %H:%M WIB\")}')
-          if not (7 <= jam <= 9):
-              print(f'SKIP: Di luar jam yang diharapkan ({jam}:xx WIB)')
-              exit(1)
-          print('OK: Jam sesuai, lanjut analisis')
-          "
+
       - name: Jalankan analisis (terjadwal)
         if: github.event_name == 'schedule'
         env:
@@ -52,6 +42,7 @@ jobs:
           SKOR_BUY: ${{ vars.SKOR_BUY || '65' }}
           SKOR_SELL: ${{ vars.SKOR_SELL || '35' }}
         run: python main.py analisis
+
       - name: Jalankan manual
         if: github.event_name == 'workflow_dispatch'
         env:
