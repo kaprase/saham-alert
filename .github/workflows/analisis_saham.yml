@@ -2,7 +2,7 @@ name: Analisis Saham IDX
 
 on:
   schedule:
-    - cron: '0 1 * * 1-5'
+    - cron: '0 22 * * 0-4'
   workflow_dispatch:
     inputs:
       mode:
