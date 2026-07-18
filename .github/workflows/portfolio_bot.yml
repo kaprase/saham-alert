@@ -1,12 +1,16 @@
 name: Clau Portfolio Bot
 
 on:
-  workflow_dispatch:  # Jalankan manual dari GitHub Actions
+  schedule:
+    # Aktif jam 07:00 WIB = 00:00 UTC (dengan antisipasi delay GitHub ~3 jam)
+    # Cron di set jam 21:00 UTC hari sebelumnya agar jalan sekitar 00:00-01:00 UTC = 07:00-08:00 WIB
+    - cron: '0 21 * * 0-6'
+  workflow_dispatch:  # Tetap bisa Run manual kapanpun
 
 jobs:
   jalankan-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 350  # ~6 jam, maksimal GitHub Actions
+    timeout-minutes: 350  # ~6 jam aktif
 
     steps:
       - name: Ambil kode dari repository
