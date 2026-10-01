@@ -31,10 +31,6 @@ def hitung_skor_gabungan(
     hasil_ai: dict,
     bobot: dict | None = None,
 ) -> dict:
-    """
-    Gabungkan skor dari tiga mesin analisis.
-    Bobot default: Teknikal 40%, Fundamental 35%, AI 25%
-    """
     if bobot is None:
         bobot = {"teknikal": 0.40, "fundamental": 0.35, "ai": 0.25}
 
@@ -57,9 +53,6 @@ def hitung_skor_gabungan(
 
 
 def tentukan_keputusan(skor_gabungan: int) -> dict:
-    """
-    Tentukan keputusan BUY / HOLD / SELL berdasarkan skor.
-    """
     skor_beli = int(os.getenv("SKOR_BUY", 65))
     skor_jual = int(os.getenv("SKOR_SELL", 35))
 
@@ -93,9 +86,6 @@ def buat_laporan_lengkap(
     hasil_fundamental: dict,
     hasil_ai: dict,
 ) -> dict:
-    """
-    Gabungkan semua hasil menjadi laporan lengkap.
-    """
     skor = hitung_skor_gabungan(hasil_teknikal, hasil_fundamental, hasil_ai)
     keputusan = tentukan_keputusan(skor["skor_gabungan"])
 
@@ -116,14 +106,14 @@ def buat_laporan_lengkap(
     }
 
 
-def format_pesan_telegram(laporan: dict) -> str:
+def format_pesan_telegram(laporan: dict, durasi_sinyal: str = "") -> str:
     """
     Format laporan menjadi pesan Telegram yang rapi.
+    durasi_sinyal: string info berapa hari sinyal sudah berlangsung
     """
     k = laporan
     skor = k["skor_gabungan"]
 
-    # Bar progress skor
     kotak_penuh = int(skor / 10)
     bar = "█" * kotak_penuh + "░" * (10 - kotak_penuh)
 
@@ -135,6 +125,13 @@ def format_pesan_telegram(laporan: dict) -> str:
         f"📊 Skor: *{skor}/100* `[{bar}]`",
         f"🏢 Sektor: {k['sektor']}",
         f"💼 Kap. Pasar: {format_market_cap(k['market_cap'])}",
+    ]
+
+    # Tambahkan info durasi sinyal kalau ada
+    if durasi_sinyal:
+        baris.append(durasi_sinyal)
+
+    baris += [
         f"",
         f"📈 *Analisis Teknikal* ({k['skor_teknikal']}/100)",
     ]
