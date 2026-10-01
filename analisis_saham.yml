@@ -1,0 +1,65 @@
+name: Analisis Saham IDX
+
+on:
+  schedule:
+    - cron: '0 22 * * 0-4'   # ~08:00 WIB (antisipasi delay GitHub 3 jam)
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode analisis'
+        required: true
+        default: 'analisis'
+        type: choice
+        options:
+          - analisis
+          - uji-telegram
+
+permissions:
+  contents: write   # izin untuk commit signal_history.json
+
+jobs:
+  jalankan-analisis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Ambil kode dari repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install library
+        run: pip install -r requirements.txt
+
+      - name: Jalankan analisis (terjadwal)
+        if: github.event_name == 'schedule'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          INDEKS_SYARIAH: ${{ vars.INDEKS_SYARIAH || 'JII70' }}
+          GITHUB_USER: ${{ vars.GITHUB_USER || '' }}
+          DAFTAR_SAHAM: ${{ vars.DAFTAR_SAHAM || '' }}
+          SKOR_BUY: ${{ vars.SKOR_BUY || '65' }}
+          SKOR_SELL: ${{ vars.SKOR_SELL || '35' }}
+        run: python main.py analisis
+
+      - name: Jalankan manual
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          INDEKS_SYARIAH: ${{ vars.INDEKS_SYARIAH || 'JII70' }}
+          GITHUB_USER: ${{ vars.GITHUB_USER || '' }}
+          DAFTAR_SAHAM: ${{ vars.DAFTAR_SAHAM || '' }}
+          SKOR_BUY: ${{ vars.SKOR_BUY || '65' }}
+          SKOR_SELL: ${{ vars.SKOR_SELL || '35' }}
+        run: python main.py ${{ github.event.inputs.mode }}
