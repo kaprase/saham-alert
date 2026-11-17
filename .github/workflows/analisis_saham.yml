@@ -1,4 +1,4 @@
-name: Analisis Saham IDX-1
+name: Analisis Saham IDX
 
 on:
   schedule:
